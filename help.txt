@@ -1,0 +1,172 @@
+Create a Virtual Environment (Best Practice)
+A virtual environment (venv) is an isolated workspace where Python libraries are installed only for your project instead of affecting the whole system.
+python -m venv myenv  # (Only needed the first time)
+myenv\Scripts\activate  # activate venv
+
+when done for the day? Deactivate venv before switching projects
+deactivate
+Now, your terminal is back to the global Python environment.
+
+when come again, activate the venv
+myenv\Scripts\activate  # activate venv
+
+Install Django
+pip install django
+
+Before sharing or deploying your project, save all installed packages:
+pip freeze > requirements.txt
+this generates a requirements.txt file in which all the installed packages are listed.
+
+When you share / deploy your project, others can install the exact dependencies using:
+pip install -r requirements.txt
+
+Creating a django project
+python -m django startproject mysite            OR
+django-admin startproject myproject
+cd mysite
+
+Django has built-in apps (auth, admin, sessions) that require database setup.
+->  python manage.py migrate
+This will apply all pending migrations and set up your database.
+
+Run 
+->  python manage.py migrate 
+to apply migrations.
+
+
+run the development server
+python manage.py runserver
+
+but if you are cloning a project then 
+git clone 'url'
+
+if you have clone a project, then type
+pip freeze > requirements.txt
+This command saves all installed packages and their versions into a requirements.txt file, 
+which can then be used to replicate the same environment on another system using:
+pip install -r requirements.txt
+
+else just type:
+pip install -r requirements.txt
+to install all the dependencies given in requirements.txt file.
+
+📌 Step 2: Setting Up a Database in Django
+Django uses SQLite by default, but you can configure PostgreSQL, MySQL, etc. in settings.py.
+
+/*Connecting with postgresql Database */
+make .env file in the project where i will add my database to connect with
+write this in .env file:
+#Database
+DB_NAME="ai_recruitement"
+DB_USER="Sana"
+DB_PASSWORD="sana"
+DB_HOST="localhost"
+DB_PORT="5432"
+
+make in database server too for this
+create new database in postgresql
+same name and all the details should give here in .env file to connect with db. 
+
+📌 Step 3: Creating a Django App
+Django projects are divided into apps for modularity.
+
+1️⃣ Create an app users (for managing users):
+->  python manage.py startapp users
+
+now we need to connect this app with our main python project
+1. open settings.py inside mysite
+2. look for "INSTALLED_APPS"
+3. put our new app here "users",
+INSTALLED_APPS = [
+    "users",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+]
+
+now we can add path to our "api" model, by:
+1. open urls.py inside mysite
+2. under url_patterns add another path for accessing this api application in our app
+3.     path('api/',include("api.urls")),
+4. import include too by:    from django.urls import include
+
+📌 Step 4: Defining a Model (Django ORM)
+Instead of writing SQL manually, Django ORM lets you define models in Python.
+
+Models define the database structure.
+Each model represents a table in the database.
+
+Now start building out our MODEL or the data that our API is going to interact with
+1. open api folder, search for model.py
+2. inside model.py we define our different database MODELs.
+django use ORM, it maps a python object to a database instance. so we can use multiple type of databases. and django handles all the low level commands that create,retrive and update data.
+
+
+now i have my model, so now i want to make table of this in the database, it just create the migrations but not applied yet.
+
+📌 Step 5: Apply Migrations (Create Tables in DB)
+1️⃣ Generate Migrations (Prepare changes for DB)
+python manage.py makemigrations users
+2️⃣ Apply Migrations (Execute changes in DB)
+python manage.py migrate
+✅ Now, Django has created a users_user table in the database!
+
+📌 Step 6: Creating a Superuser for Admin Panel
+python manage.py createsuperuser
+Enter username, email, and password.
+Then log in to http://127.0.0.1:8000/admin/ to manage users! 🎉
+
+we use this command to make migration for our model to add in database, 
+whenever I make any changes in my model, i will call this:
+->  py manage.py makemigrations users
+it makes a migrations folder, and inside this migration is created in this file: 0001_initial.py
+and then use this cmd to add this changes in the database,
+py manage.py migrate
+
+Now let's move to Django REST Framework (DRF), which is used to build APIs for your Next.js frontend. 🚀
+📌 Step 1: Install Django REST Framework (DRF)
+Run this command in your terminal:
+pip install djangorestframework
+Then, add rest_framework to INSTALLED_APPS in myproject/settings.py:
+
+INSTALLED_APPS = [
+    "rest_framework",  # Add this
+    "users",  # Your custom app
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+]
+✅ Now, Django REST Framework is installed and ready to use! 🎉
+
+📌 Step 2: Create an API for Users
+Let's modify your users app to expose user data via an API.
+
+1️⃣ Define a Serializer
+
+Serializers convert Django model instances into JSON format (for API responses).
+They also validate incoming JSON data before saving it to the database.
+
+make a serializer.py file
+Now defining a SERIALIZER in serializers.py
+✅ This file is important because Django REST Framework (DRF) uses it to convert model data into JSON format for APIs.
+
+2️⃣ Create an API View
+Views handle API logic like getting, creating, updating, or deleting data.
+This retrieves all blogs, serializes them, and returns JSON data.
+
+Now we are creating VIEWS that use our model and SERIALIZER
+now we need to specify a route or url that allows us to access the view
+
+How They Work Together
+A request comes in (e.g., GET /blogs/).
+The view (views.py) calls the model (models.py) to get data.
+The serializer (serializers.py) converts that data into JSON.
+The response is sent back to the client.
+
+now for testing, setup Postman,
