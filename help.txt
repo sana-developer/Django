@@ -87,11 +87,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-now we can add path to our "api" model, by:
-1. open urls.py inside mysite
-2. under url_patterns add another path for accessing this api application in our app
-3.     path('api/',include("api.urls")),
-4. import include too by:    from django.urls import include
 
 📌 Step 4: Defining a Model (Django ORM)
 Instead of writing SQL manually, Django ORM lets you define models in Python.
@@ -169,4 +164,54 @@ The view (views.py) calls the model (models.py) to get data.
 The serializer (serializers.py) converts that data into JSON.
 The response is sent back to the client.
 
+
+3️⃣ Define the API Route
+📌 File: users/urls.py   // create this urls.py file 
+
+📌 Now include this in myproject/urls.py:
+
+✅ Now, you can access the API at:
+👉 http://127.0.0.1:8000/api/users/
+
+
+now we can add path to our "api" model, by:
+1. open urls.py inside mysite
+2. under url_patterns add another path for accessing this api application in our app
+3.     path('api/',include("api.urls")),
+4. import include too by:    from django.urls import include
+
+
 now for testing, setup Postman,
+
+📌 How to Test Your Django API in Postman
+1️⃣ Start Your Django Server
+2️⃣ Open Postman
+Open Postman (download from here if you haven’t).
+Click on "New Request".
+Select "GET" from the dropdown.
+In the request URL, enter:
+http://127.0.0.1:8000/api/users/
+Click "Send".
+✅ You should receive a JSON response with the list of users.
+
+3️⃣ Handling CORS Issues (If Needed)
+If Postman gives an error like "CORS policy: No 'Access-Control-Allow-Origin'", install the Django CORS middleware:
+
+pip install django-cors-headers
+Then, add it to INSTALLED_APPS in settings.py:
+
+INSTALLED_APPS = [
+    "corsheaders",  # Add this
+    "rest_framework",
+    "users",
+]
+And in MIDDLEWARE (above all other middleware):
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # Add this
+    "django.middleware.security.SecurityMiddleware",
+    ...
+]
+Finally, allow all origins for testing:
+CORS_ALLOW_ALL_ORIGINS = True  # (For development only, not for production)
+Now restart your server:
+python manage.py runserver
