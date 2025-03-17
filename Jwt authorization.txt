@@ -1,0 +1,80 @@
+📌 Step 1: Install Django REST Framework Simple JWT
+pip install djangorestframework-simplejwt
+hen, add it to INSTALLED_APPS in settings.py:
+
+python
+Copy code
+INSTALLED_APPS = [
+    "rest_framework",
+    "rest_framework_simplejwt",  # Add this for JWT authentication
+    "users",  
+]
+📌 Step 2: Configure DRF for JWT Authentication
+In settings.py, add JWT as the default authentication method:
+
+python
+Copy code
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),  # Token expires in 1 day
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Refresh token expires in 7 days
+}
+✅ Now, DRF will use JWT for authentication.
+
+📌 Step 3: Create API Endpoints for Login & Token Generation
+1️⃣ Add JWT Token Endpoints to users/urls.py
+Modify your users/urls.py to include token routes:
+
+python
+Copy code
+from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+urlpatterns = [
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),  # Get access & refresh token
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),  # Refresh access token
+]
+✅ Now, you can get a JWT token by sending a login request!
+
+📌 Step 4: Test JWT Authentication in Postman
+1️⃣ Obtain a JWT Token
+Method: POST
+URL: http://127.0.0.1:8000/api/token/
+Body (JSON):
+json
+Copy code
+{
+  "email": "sana@example.com",
+  "password": "yourpassword"
+}
+Response:
+json
+Copy code
+{
+  "refresh": "refresh_token_here",
+  "access": "access_token_here"
+}
+2️⃣ Use the Token for Protected Routes
+Now, when making a GET request to a protected API (like /api/users/), add the Authorization header:
+Authorization: Bearer access_token_here
+✅ This secures your API! Only authenticated users can access protected routes.
+
+📌 Step 5: Protect an API Route
+To protect an API route using JWT authentication, modify your users/views.py:
+
+from rest_framework.permissions import IsAuthenticated
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])  # Only authenticated users can access
+def get_users(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
+✅ Now, only logged-in users with a valid JWT token can access /api/users/.

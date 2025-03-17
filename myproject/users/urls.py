@@ -1,6 +1,10 @@
 from django.urls import path
-from .views import get_users
+from .views import user_list_create, user_detail
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    path('users/', get_users),  # API endpoint: /api/users/ # define the path to the get_users function
-]
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # Get access & refresh tokens
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # Refresh access token
+    path('users/', user_list_create), # For GET (all users) & POST (create user)
+    path('users/<int:pk>/', user_detail),   # For GET, PUT, DELETE (specific user)
+    ]

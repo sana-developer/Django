@@ -1,3 +1,20 @@
+Creating a django project
+python -m django startproject mysite            OR
+django-admin startproject myproject
+cd mysite
+
+Django has built-in apps (auth, admin, sessions) that require database setup.
+->  python manage.py migrate
+This will apply all pending migrations and set up your database.
+
+Run 
+->  python manage.py migrate 
+to apply migrations.
+
+
+run the development server
+python manage.py runserver
+
 Create a Virtual Environment (Best Practice)
 A virtual environment (venv) is an isolated workspace where Python libraries are installed only for your project instead of affecting the whole system.
 python -m venv myenv  # (Only needed the first time)
@@ -20,22 +37,6 @@ this generates a requirements.txt file in which all the installed packages are l
 When you share / deploy your project, others can install the exact dependencies using:
 pip install -r requirements.txt
 
-Creating a django project
-python -m django startproject mysite            OR
-django-admin startproject myproject
-cd mysite
-
-Django has built-in apps (auth, admin, sessions) that require database setup.
-->  python manage.py migrate
-This will apply all pending migrations and set up your database.
-
-Run 
-->  python manage.py migrate 
-to apply migrations.
-
-
-run the development server
-python manage.py runserver
 
 but if you are cloning a project then 
 git clone 'url'
@@ -164,6 +165,9 @@ The view (views.py) calls the model (models.py) to get data.
 The serializer (serializers.py) converts that data into JSON.
 The response is sent back to the client.
 
+OPTIONAL - if you want to use your own User model, instead of the django user model:
+Tell Django to use this model in settings.py:
+AUTH_USER_MODEL = "users.User"
 
 3️⃣ Define the API Route
 📌 File: users/urls.py   // create this urls.py file 
@@ -193,25 +197,3 @@ In the request URL, enter:
 http://127.0.0.1:8000/api/users/
 Click "Send".
 ✅ You should receive a JSON response with the list of users.
-
-3️⃣ Handling CORS Issues (If Needed)
-If Postman gives an error like "CORS policy: No 'Access-Control-Allow-Origin'", install the Django CORS middleware:
-
-pip install django-cors-headers
-Then, add it to INSTALLED_APPS in settings.py:
-
-INSTALLED_APPS = [
-    "corsheaders",  # Add this
-    "rest_framework",
-    "users",
-]
-And in MIDDLEWARE (above all other middleware):
-MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # Add this
-    "django.middleware.security.SecurityMiddleware",
-    ...
-]
-Finally, allow all origins for testing:
-CORS_ALLOW_ALL_ORIGINS = True  # (For development only, not for production)
-Now restart your server:
-python manage.py runserver
