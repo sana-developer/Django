@@ -1,26 +1,26 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# Create custom user model
-class User(AbstractUser):   # Extending Django's User model
-    name = models.CharField(max_length==100, blank=True, null=True)
-    email = models.EmailField(unique=True)
+# Custom User Model
+class User(AbstractUser):
+    ROLE_CHOICES = [
+        ("admin", "Admin"),
+        ("candidate", "Candidate"),
+        ("employer", "Employer"),
+    ]
+
+    # Fields
+    name = models.CharField(max_length=100, default="default name")
+    email = models.EmailField(unique=True)  # Email as a unique field
     age = models.IntegerField(blank=True, null=True)
+    role = models.CharField(max_length=100, choices=ROLE_CHOICES, default=None, blank=True, null=True)
 
-    ROLE_CHOICES = (
-        ('admin', 'Admin'),
-        ('candidate','Candidate'),
-        ('employer','Employer')
-    )
+    # Remove the username field from the form but keep it in the database
+    username = None  # Disable the username field
 
-# Create your SIMPLE model here.
-class User(models.Model):
-    name = models.CharField(max_length=100, blank=True, null=True)
-    email = models.EmailField(unique=True)
-    age = models.IntegerField()
+    # Use email as the unique identifier
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["name", "age", "role"]  # Fields required when creating a superuser
 
-    def __str__(self):  
-        return self.name
-    
-    # This creates a users_user table in the database!
-
+    def __str__(self):
+        return self.email

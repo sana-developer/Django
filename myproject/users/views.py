@@ -1,11 +1,14 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .models import User
 from .serializers import UserSerializer
 
 @api_view(['GET','POST'])
+@permission_classes([IsAuthenticated]) # Ensure the user is authenticated
 def user_list_create(request):
     if request.method == 'GET':
         # get all users
