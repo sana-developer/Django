@@ -3,9 +3,11 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdmin, IsEmployer, IsCandidate
+from rest_framework.generics import ListAPIView
 
-from .models import User
-from .serializers import UserSerializer
+from .models import User, Employer
+from .serializers import UserSerializer, EmployerSerializer
 
 @api_view(['GET','POST'])
 @permission_classes([IsAuthenticated]) # Ensure the user is authenticated
@@ -36,7 +38,8 @@ def user_detail(request, pk):
         serializer = UserSerializer(user)
         return Response(serializer.data)
     elif request.method == 'PUT': #Update the user
-        serializer = UserSerializer(user, request.data)
+        serializer = UserSerializer(user, data=request.data, partial=True) # partial=True allows partial updates
+        # If you want to update only some fields, set partial=True
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -44,6 +47,14 @@ def user_detail(request, pk):
     elif request.method == 'DELETE':
         user.delete()
         return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class EmployerListView(ListAPIView):
+    queryset = Employer.objects.all()
+    serializer_class = EmployerSerializer
+    permission_classes = [IsAuthenticated, IsEmployer]
+
+
 
 
 # POST	Create a new resource	Sends data to the server to create something new	Creating a new user (POST /users/)
